@@ -16,7 +16,7 @@ except OSError:
     os.system("pause")
     os.execv(sys.executable, ['python'] + sys.argv)
 
-print("伺服器已啟動")
+print("伺服器已啟動，在 >", socket.gethostbyname(socket.gethostname()))
 
 s.listen(port)
 
