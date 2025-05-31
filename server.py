@@ -16,11 +16,24 @@ except OSError:
     os.system("pause")
     os.execv(sys.executable, ['python'] + sys.argv)
 
-print("伺服器已啟動")
+print("伺服器已啟動，在 >", socket.gethostbyname(socket.gethostname()))
 
 s.listen(port)
 
 sockets = []
+
+def send_all(response):
+    try:
+        for i in sockets:
+            try:
+                i.send(response)
+            except ValueError:
+                sockets.remove(i)
+                print("已移除", i)
+    except ConnectionResetError:
+        print("客戶端已中斷連線。")
+
+
 def handle_client(client_socket, ips, ports):
     sockets.append(client_socket)
 
@@ -30,19 +43,11 @@ def handle_client(client_socket, ips, ports):
             print("接收到訊息 >", request.decode())
 
             print("現有的客戶端 >", len(sockets))
-            for i in sockets:
-                i.send(request)
+            send_all(request)
         except ConnectionResetError:
             print("%s:%d" % (ips, ports), "已中斷連線。")
-            sockets.remove(client_socket)
         except UnicodeDecodeError:
-            print("收到無法解讀的訊息，可能是一個檔案")
-            try:
-                for i in sockets:
-                    i.send(request)
-            except ConnectionResetError:
-                print("%s:%d" % (ips, ports), "已中斷連線。")
-                sockets.remove(client_socket)
+            send_all(request)
 
 
 while True:
