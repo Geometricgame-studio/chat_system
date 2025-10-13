@@ -2,6 +2,7 @@ import socket
 import threading
 import os
 import sys
+import time
 
 os.system("cls")
 os.system("title 伺服器端")
@@ -10,7 +11,7 @@ s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
 port = 5000
 try:
-    s.bind(("127.0.0.1", port))
+    s.bind(("0.0.0.0", port))
 except OSError:
     print("伺服器已經在另一個地方啟動，請先關閉該伺服器再重新啟動此程式。")
     os.system("pause")
@@ -31,7 +32,11 @@ def send_all(response):
                 sockets.remove(i)
                 print("已移除", i)
     except ConnectionResetError:
-        print("客戶端已中斷連線。")
+        sockets.remove(i)
+        print("已移除", i)
+        print("檢測到已中斷連線的客戶端。")
+
+        send_all(response)
 
 
 def handle_client(client_socket, ips, ports):
@@ -42,10 +47,16 @@ def handle_client(client_socket, ips, ports):
             request = client_socket.recv(9999999)
             print("接收到訊息 >", request.decode())
 
+            tmp = "infos:usercount:" + str(len(sockets))
+            send_all(tmp.encode())
+
             print("現有的客戶端 >", len(sockets))
+            
+            time.sleep(0.05)
             send_all(request)
         except ConnectionResetError:
             print("%s:%d" % (ips, ports), "已中斷連線。")
+            break
         except UnicodeDecodeError:
             send_all(request)
 
