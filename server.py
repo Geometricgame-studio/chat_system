@@ -32,11 +32,15 @@ def send_all(response):
                 sockets.remove(i)
                 print("已移除", i)
     except ConnectionResetError:
+<<<<<<< HEAD
         sockets.remove(i)
         print("已移除", i)
         print("檢測到已中斷連線的客戶端。")
 
         send_all(response)
+=======
+        print("客戶端已中斷連線。")
+>>>>>>> f451aae4d247eec90867b4253b43dc596d22ef25
 
 
 def handle_client(client_socket, ips, ports):
@@ -51,12 +55,18 @@ def handle_client(client_socket, ips, ports):
             send_all(tmp.encode())
 
             print("現有的客戶端 >", len(sockets))
+<<<<<<< HEAD
             
             time.sleep(0.05)
             send_all(request)
         except ConnectionResetError:
             print("%s:%d" % (ips, ports), "已中斷連線。")
             break
+=======
+            send_all(request)
+        except ConnectionResetError:
+            print("%s:%d" % (ips, ports), "已中斷連線。")
+>>>>>>> f451aae4d247eec90867b4253b43dc596d22ef25
         except UnicodeDecodeError:
             send_all(request)
 
